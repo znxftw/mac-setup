@@ -74,3 +74,25 @@ for filepath in files/*; do
     override_prompt "files/${filename}" "${HOME}/${filename}"
 done
 shopt -u dotglob #reset hidden files setting
+
+##################################
+# Install custom plugins for zsh #
+##################################
+ZSH_CUSTOM=${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}
+mkdir -p "${ZSH_CUSTOM}/plugins"
+clone_if_not_present() {
+  [ ! -d "${ZSH_CUSTOM}/plugins/$(basename $1)" ] && git -C "${ZSH_CUSTOM}/plugins" clone --depth=1 $1
+}
+# Note: Do not move these into '.brewfile' - since that breaks the linking for omz plugins location
+clone_if_not_present https://github.com/zsh-users/zsh-syntax-highlighting
+clone_if_not_present https://github.com/zsh-users/zsh-autosuggestions
+
+
+source "${HOME}/.zshenv"
+source "${HOME}/.zprofile"
+source "${HOME}/.zshrc"
+
+sudo mkdir -p "${HOMEBREW_PREFIX}/tmp" "${HOMEBREW_PREFIX}/repository" "${HOMEBREW_PREFIX}/plugins" "${HOMEBREW_PREFIX}/bin"
+sudo chown -fR "${USERNAME}":admin "${HOMEBREW_PREFIX}"
+
+command_exists brew || bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
